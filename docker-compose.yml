@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: test_db_container
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=test_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    container_name: adminer_container
+
+  backend:
+    build: .
+    restart: always
+    ports:
+      - "8000:8000"
+    container_name: backend_auth
+    depends_on:
+      - db
+    env_file: .env
+
+volumes:
+  postgres_data:
