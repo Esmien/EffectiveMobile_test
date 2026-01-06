@@ -1,4 +1,17 @@
 import bcrypt
+import os
+from datetime import datetime, timedelta, timezone
+from jose import jwt
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
+SECRET_KEY = os.getenv('SECRET_KEY')
+ALGORITHM = os.getenv('ALGORITHM', 'HS256')
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv('ACCESS_TOKEN_EXPIRE_MINUTES', 30))
+
+
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -40,3 +53,31 @@ def get_password_hash(password: str) -> str:
 
     # Возвращаем хеш в виде строки
     return hashed_password.decode('utf-8')
+
+
+def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
+    """
+        Создает JWT токен.
+
+        Args:
+            data (dict): Данные, которые мы хотим зашить в токен (например, {"sub": "user_email"}).
+            expires_delta (timedelta): Время жизни токена. Если не передано, берем дефолтное.
+
+        Returns:
+            str: Закодированный токен.
+        """
+
+    # Спасаем исходный словарь от мутаций
+    curr_data = data.copy()
+    expires_time = datetime.now(timezone.utc)
+
+    # Если время жизни токена не задано, берем дефолтное
+    if expires_delta:
+        expires_time += expires_delta
+    else:
+        expires_time += timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+
+    # Добавляем время жизни токена в словарь
+    curr_data["exp"] = expires_time
+
+    return jwt.encode(curr_data, SECRET_KEY, algorithm=ALGORITHM)
