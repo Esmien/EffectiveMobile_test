@@ -24,6 +24,7 @@ async def get_me(
     """
     return current_user
 
+
 @router.patch("/me", response_model=UserRead)
 async def update_me(
         user_update: UserUpdate,
