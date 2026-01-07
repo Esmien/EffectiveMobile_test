@@ -16,6 +16,8 @@ sys.path.append(os.getcwd())
 # 2. Импортируем Base и наши Модели
 from app.database.session import Base
 from app.core.config import DATABASE_URL
+from app.models.rbac import BusinessElement, AccessRule
+from app.models.users import User, Role
 
 config = context.config
 

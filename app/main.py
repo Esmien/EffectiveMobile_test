@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from app.api import auth, users, admin, business_elements
 from app.database.session import async_session
 from app.database.init_db import init_db
+from app.core.config import UVI_HOST, UVI_PORT
 
 
 def run_migrations():
@@ -31,7 +32,7 @@ app.include_router(business_elements.router, prefix="/business-elements", tags=[
 if __name__ == "__main__":
     uvicorn.run(
         "app.main:app",
-        host="0.0.0.0",
-        port=8000,
+        host=UVI_HOST,
+        port=UVI_PORT,
         reload=True,
     )

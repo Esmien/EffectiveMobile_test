@@ -15,3 +15,5 @@ DATABASE_URL = os.getenv(
     "DATABASE_URL",
     "postgresql+asyncpg://postgres:postgres@localhost:5432/test_db"
 )
+UVI_PORT = int(os.getenv('UVI_PORT', 8000))
+UVI_HOST = os.getenv('UVI_HOST', '0.0.0.0')

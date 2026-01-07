@@ -1,8 +1,8 @@
-"""initial_structure
+"""initial
 
-Revision ID: 7891736e1bbe
+Revision ID: ca9bd6c777c1
 Revises: 
-Create Date: 2026-01-07 15:11:48.678558
+Create Date: 2026-01-07 21:14:44.037072
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '7891736e1bbe'
+revision: str = 'ca9bd6c777c1'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -38,12 +38,12 @@ def upgrade() -> None:
     sa.Column('business_element_id', sa.BigInteger(), nullable=False),
     sa.Column('role_id', sa.BigInteger(), nullable=False),
     sa.Column('read_permission', sa.Boolean(), nullable=False),
-    sa.Column('read_all_permissions', sa.Boolean(), nullable=False),
+    sa.Column('read_all_permission', sa.Boolean(), nullable=False),
     sa.Column('create_permission', sa.Boolean(), nullable=False),
     sa.Column('update_permission', sa.Boolean(), nullable=False),
-    sa.Column('update_all_permissions', sa.Boolean(), nullable=False),
+    sa.Column('update_all_permission', sa.Boolean(), nullable=False),
     sa.Column('delete_permission', sa.Boolean(), nullable=False),
-    sa.Column('delete_all_permissions', sa.Boolean(), nullable=False),
+    sa.Column('delete_all_permission', sa.Boolean(), nullable=False),
     sa.ForeignKeyConstraint(['business_element_id'], ['business_elements.id'], ),
     sa.ForeignKeyConstraint(['role_id'], ['roles.id'], ),
     sa.PrimaryKeyConstraint('id')
