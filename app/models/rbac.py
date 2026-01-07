@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import BigInteger, String, ForeignKey, Boolean
 
-from app.database.db.session import Base
+from app.database.session import Base
 
 
 class BusinessElement(Base):
@@ -21,9 +21,9 @@ class AccessRule(Base):
     role = relationship("Role")
 
     read_permission: Mapped[bool] = mapped_column(Boolean, default=False)
-    read_all_permissions: Mapped[bool] = mapped_column(Boolean, default=False)
+    read_all_permission: Mapped[bool] = mapped_column(Boolean, default=False)
     create_permission: Mapped[bool] = mapped_column(Boolean, default=False)
     update_permission: Mapped[bool] = mapped_column(Boolean, default=False)
-    update_all_permissions: Mapped[bool] = mapped_column(Boolean, default=False)
+    update_all_permission: Mapped[bool] = mapped_column(Boolean, default=False)
     delete_permission: Mapped[bool] = mapped_column(Boolean, default=False)
-    delete_all_permissions: Mapped[bool] = mapped_column(Boolean, default=False)
+    delete_all_permission: Mapped[bool] = mapped_column(Boolean, default=False)

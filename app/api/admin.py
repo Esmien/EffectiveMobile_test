@@ -2,11 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.db.session import get_session
+from app.database.session import get_session
 from app.schemas.user import UserRead
-from app.schemas.admin import AccessRuleUpdate, UserRoleUpdate, BusinessElementCreate, BusinessElementRead
+from app.schemas.admin import AccessRuleUpdate, UserRoleUpdate
 from app.models.users import User, Role
-from app.models.rbac import BusinessElement, AccessRule
+from app.models.rbac import AccessRule
 from app.api.deps import get_admin_user
 
 
@@ -33,6 +33,7 @@ async def update_user_role(
             UserRead: Обновленный пользователь
         """
 
+    # Проверяем, существует ли пользователь
     query = select(User).where(User.id == user_id)
     result = await session.execute(query)
     user = result.scalar_one_or_none()
@@ -43,6 +44,7 @@ async def update_user_role(
             detail="Пользователь не найден"
         )
 
+    # Проверяем, существует ли роль
     query_role = select(Role).where(Role.id == role_update.role_id)
     result_role = await session.execute(query_role)
 
@@ -52,6 +54,7 @@ async def update_user_role(
             detail="Роль не найдена"
         )
 
+    # Обновляем роль пользователя
     user.role_id = role_update.role_id
     session.add(user)
     await session.commit()
@@ -77,6 +80,7 @@ async def update_access_rule(
             session: сессия БД
         """
 
+    # Проверяем, существует ли правило доступа
     query = select(AccessRule).where(
         AccessRule.role_id == role_id,
         AccessRule.business_element_id == element_id
@@ -90,6 +94,7 @@ async def update_access_rule(
             detail="Правило доступа не найдено. Проверьте id роли и элемента"
         )
 
+    # Обновляем права доступа
     update_data = rule_update.model_dump(exclude_unset=True)
     for key, value in update_data.items():
         setattr(rule, key, value)

@@ -2,11 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.db.session import get_session
+from app.database.session import get_session
 from app.schemas.admin import BusinessElementCreate, BusinessElementRead
 from app.models.users import Role
 from app.models.rbac import BusinessElement, AccessRule
-from app.api.deps import get_admin_user, PermissionChecker
+from app.api.deps import get_admin_user
 
 
 router = APIRouter()
@@ -27,6 +27,7 @@ async def create_business_element(
             BusinessElementRead: созданный элемент
         """
 
+    # проверяем, что элемент с таким именем еще не существует
     query = select(BusinessElement).where(BusinessElement.name == element_in.name)
     result = await session.execute(query)
 
@@ -36,11 +37,13 @@ async def create_business_element(
             detail=f"Элемент {element_in.name} уже существует"
         )
 
+    # создаем новый элемент
     new_element = BusinessElement(name=element_in.name)
     session.add(new_element)
     await session.flush()
     await session.refresh(new_element)
 
+    # создаем для него правила доступа для всех ролей
     roles_result = await session.execute(select(Role))
     roles = roles_result.scalars().all()
 
@@ -52,12 +55,12 @@ async def create_business_element(
             business_element_id=new_element.id,
             # все права доступа для админа
             read_permission=is_admin,
-            read_all_permissions=is_admin,
+            read_all_permission=is_admin,
             create_permission=is_admin,
             update_permission=is_admin,
-            update_all_permissions=is_admin,
+            update_all_permission=is_admin,
             delete_permission=is_admin,
-            delete_all_permissions=is_admin
+            delete_all_permission=is_admin
         )
         session.add(new_rule)
 

@@ -19,10 +19,12 @@ async def _get_or_create(session: AsyncSession, model, **kwargs):
             Объект модели
         """
 
+    # Проверяем, существует ли объект с такими параметрами
     query = select(model).filter_by(**kwargs)
     result = await session.execute(query)
     instance = result.scalar_one_or_none()
 
+    # Если объекта нет, создаем его и добавляем в сессию
     if instance is None:
         instance = model(**kwargs)
         session.add(instance)
@@ -46,6 +48,7 @@ async def _create_access_rule_if_not_exists(
             permissions: dict - права доступа
         """
 
+    # Проверяем, существует ли правило доступа с такими параметрами
     query = select(AccessRule).where(
         AccessRule.role_id == role_id,
         AccessRule.business_element_id == element_id
@@ -53,6 +56,7 @@ async def _create_access_rule_if_not_exists(
     result = await session.execute(query)
     rule = result.scalar_one_or_none()
 
+    # Если правило не существует, создаем его и добавляем в сессию
     if rule is None:
         rule = AccessRule(
             role_id=role_id,
@@ -75,7 +79,7 @@ async def init_db(session: AsyncSession):
     result = await session.execute(query)
     admin_user = result.scalar_one_or_none()
 
-    # Если амин не создан, создаем его
+    # Если админ не создан, создаем его
     if not admin_user:
         admin_user = User(
             email="admin@admin.com",
@@ -84,7 +88,7 @@ async def init_db(session: AsyncSession):
             name="Admin"
         )
         session.add(admin_user)
-        await session.flush()  # Чтобы получить ID пользователя для дальнейших связей
+        await session.flush()
         await session.refresh(admin_user)
 
     # Создаем элемент бизнес-логики "users"

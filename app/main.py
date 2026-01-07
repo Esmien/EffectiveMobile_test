@@ -4,7 +4,7 @@ import uvicorn
 from fastapi import FastAPI
 
 from app.api import auth, users, admin, business_elements
-from app.database.db.session import async_session
+from app.database.session import async_session
 from app.database.init_db import init_db
 
 

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.db.session import get_session
+from app.database.session import get_session
 from app.schemas.user import UserRead, UserUpdate
 from app.models.users import User
 from app.api.deps import get_current_user, PermissionChecker
@@ -43,6 +43,7 @@ async def update_me(
             UserRead: обновленный профиль пользователя
         """
 
+    # Обновляем данные пользователя
     for key, value in user_update.model_dump(exclude_unset=True).items():
         if value:
             setattr(current_user, key, value)
@@ -68,6 +69,7 @@ async def delete_me(
             JSON: сообщение об успешном удалении
         """
 
+    # Удаляем пользователя, делая его неактивным
     current_user.is_active = False
     session.add(current_user)
     await session.commit()
@@ -76,8 +78,18 @@ async def delete_me(
 @router.get("/users", response_model=list[UserRead])
 async def get_users(
         session: AsyncSession = Depends(get_session),
-        _: User = Depends(PermissionChecker(business_element="users", permission="read_all_permissions"))
+        _: User = Depends(PermissionChecker(business_element="users", permission="read_all_permission"))
 ):
+    """
+        Получение списка всех пользователей, доступно только пользователям с разрешением на чтение всех пользователей
+
+        Args:
+            session: сессия БД
+            _: текущий пользователь, проверка прав
+        Returns:
+            list[UserRead]: список пользователей
+    """
+
     query = select(User)
     result = await session.execute(query)
     return result.scalars().all()

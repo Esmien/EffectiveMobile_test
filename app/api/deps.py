@@ -4,7 +4,7 @@ from jose import jwt, JWTError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from app.database.db.session import get_session
+from app.database.session import get_session
 from app.models.users import User
 from app.models.rbac import AccessRule, BusinessElement
 from app.core.config import SECRET_KEY, ALGORITHM
@@ -82,6 +82,14 @@ async def get_admin_user(
 
 
 class PermissionChecker:
+    """
+        Проверяет наличие прав у пользователя
+
+        Attributes:
+            business_element: элемент бизнес-логики
+            permission: право доступа
+    """
+
     def __init__(self, business_element: str, permission: str):
         self.business_element = business_element
         self.permission = permission
@@ -101,6 +109,7 @@ class PermissionChecker:
                 HTTPException: если у пользователя нет прав
         """
 
+        # Поиск элемента бизнес-логики и прав доступа
         query_element = select(BusinessElement).where(BusinessElement.name == self.business_element)
         result_element = await session.execute(query_element)
         element = result_element.scalar_one_or_none()
@@ -124,6 +133,7 @@ class PermissionChecker:
                 detail="Права доступа не найдены",
             )
 
+        # Проверка наличия прав у пользователя
         permission_value = getattr(rule, self.permission)
 
         if not permission_value:
