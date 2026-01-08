@@ -57,7 +57,7 @@
 
 3.  **Запуск контейнеров:**
     ```bash
-    docker-compose up --build -d
+    docker compose up --build -d
     ```
 
 При запуске автоматически:
