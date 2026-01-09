@@ -7,56 +7,56 @@ from app.core.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
-        Проверяет, совпадает ли пароль с хешем
+    Проверяет, совпадает ли пароль с хешем
 
-        Args:
-            plain_password (str): Пароль в открытом виде
-            hashed_password (str): Хеш пароля
+    Args:
+        plain_password (str): Пароль в открытом виде
+        hashed_password (str): Хеш пароля
 
-        Returns:
-            bool: True, если пароль совпадает с хешем, иначе False
+    Returns:
+        bool: True, если пароль совпадает с хешем, иначе False
     """
 
     # Превращаем пароль в набор байтов
-    password_bytes = plain_password.encode('utf-8')
+    password_bytes = plain_password.encode("utf-8")
 
     # Проверяем, совпадает ли пароль с хешем
-    return bcrypt.checkpw(password_bytes, hashed_password.encode('utf-8'))
+    return bcrypt.checkpw(password_bytes, hashed_password.encode("utf-8"))
 
 
 def get_password_hash(password: str) -> str:
     """
-        Генерирует хеш пароля
+    Генерирует хеш пароля
 
-        Args:
-            password (str): Пароль в открытом виде
+    Args:
+        password (str): Пароль в открытом виде
 
-        Returns:
-            str: Хеш пароля
+    Returns:
+        str: Хеш пароля
     """
 
     # Превращаем пароль в набор байтов
-    password_bytes = password.encode('utf-8')
+    password_bytes = password.encode("utf-8")
 
     # Генерируем соль
     salt = bcrypt.gensalt()
     hashed_password = bcrypt.hashpw(password_bytes, salt)
 
     # Возвращаем хеш в виде строки
-    return hashed_password.decode('utf-8')
+    return hashed_password.decode("utf-8")
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
     """
-        Создает JWT токен.
+    Создает JWT токен.
 
-        Args:
-            data (dict): Данные, которые мы хотим зашить в токен (например, {"sub": "user_email"}).
-            expires_delta (timedelta): Время жизни токена. Если не передано, берем дефолтное.
+    Args:
+        data (dict): Данные, которые мы хотим зашить в токен (например, {"sub": "user_email"}).
+        expires_delta (timedelta): Время жизни токена. Если не передано, берем дефолтное.
 
-        Returns:
-            str: Закодированный токен.
-        """
+    Returns:
+        str: Закодированный токен.
+    """
 
     # Спасаем исходный словарь от мутаций
     curr_data = data.copy()

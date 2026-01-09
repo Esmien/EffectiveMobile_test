@@ -18,6 +18,7 @@ class UserRoleUpdate(BaseModel):
 class BusinessElementCreate(BaseModel):
     name: str
 
+
 class BusinessElementRead(BaseModel):
     id: int
     name: str

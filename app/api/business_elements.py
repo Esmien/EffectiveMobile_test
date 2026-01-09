@@ -10,21 +10,27 @@ from app.api.deps import get_admin_user
 
 
 router = APIRouter()
-@router.post("/elements", dependencies=[Depends(get_admin_user)], response_model=BusinessElementRead)
+
+
+@router.post(
+    "/elements",
+    dependencies=[Depends(get_admin_user)],
+    response_model=BusinessElementRead,
+)
 async def create_business_element(
-        element_in: BusinessElementCreate,
-        session: AsyncSession = Depends(get_session),
+    element_in: BusinessElementCreate,
+    session: AsyncSession = Depends(get_session),
 ):
     """
-        Создаем новый бизнес-элемент
+    Создаем новый бизнес-элемент
 
-        Args:
-            element_in: данные для создания элемента
-            session: сессия БД
+    Args:
+        element_in: данные для создания элемента
+        session: сессия БД
 
-        Returns:
-            BusinessElementRead: созданный элемент
-        """
+    Returns:
+        BusinessElementRead: созданный элемент
+    """
 
     # проверяем, что элемент с таким именем еще не существует
     query = select(BusinessElement).where(BusinessElement.name == element_in.name)
@@ -32,8 +38,7 @@ async def create_business_element(
 
     if result.scalar_one_or_none():
         raise HTTPException(
-            status_code=400,
-            detail=f"Элемент {element_in.name} уже существует"
+            status_code=400, detail=f"Элемент {element_in.name} уже существует"
         )
 
     # создаем новый элемент
@@ -47,7 +52,7 @@ async def create_business_element(
     roles = roles_result.scalars().all()
 
     for role in roles:
-        is_admin = (role.name == "admin")
+        is_admin = role.name == "admin"
 
         new_rule = AccessRule(
             role_id=role.id,
@@ -59,7 +64,7 @@ async def create_business_element(
             update_permission=is_admin,
             update_all_permission=is_admin,
             delete_permission=is_admin,
-            delete_all_permission=is_admin
+            delete_all_permission=is_admin,
         )
         session.add(new_rule)
 
@@ -69,18 +74,16 @@ async def create_business_element(
 
 
 @router.get("/elements", response_model=list[BusinessElementRead])
-async def get_business_elements(
-        session: AsyncSession = Depends(get_session)
-):
+async def get_business_elements(session: AsyncSession = Depends(get_session)):
     """
-        Получаем список бизнес-элементов
+    Получаем список бизнес-элементов
 
-        Args:
-            session: сессия БД
+    Args:
+        session: сессия БД
 
-        Returns:
-            list[BusinessElementRead]: список всех бизнес-элементов
-        """
+    Returns:
+        list[BusinessElementRead]: список всех бизнес-элементов
+    """
 
     query = select(BusinessElement)
     result = await session.execute(query)

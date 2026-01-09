@@ -12,20 +12,20 @@ from app.core.security import get_password_hash, verify_password, create_access_
 
 router = APIRouter()
 
+
 @router.post("/register", response_model=UserRead)
 async def register_user(
-        user_in: UserRegister,
-        session: AsyncSession = Depends(get_session)
+    user_in: UserRegister, session: AsyncSession = Depends(get_session)
 ):
     """
-        Регистрирует пользователя, назначая ему по умолчанию роль "user"
+    Регистрирует пользователя, назначая ему по умолчанию роль "user"
 
-        Args:
-            user_in (UserRegister): Пользователь, которого нужно зарегистрировать
-            session (AsyncSession): Сессия БД
+    Args:
+        user_in (UserRegister): Пользователь, которого нужно зарегистрировать
+        session (AsyncSession): Сессия БД
 
-        Returns:
-            UserRead: Зарегистрированный пользователь
+    Returns:
+        UserRead: Зарегистрированный пользователь
     """
 
     # Проверка на существование пользователя с таким же email
@@ -35,11 +35,11 @@ async def register_user(
     if result.scalar_one_or_none() is not None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Пользователь с таким email уже зарегистрирован!"
+            detail="Пользователь с таким email уже зарегистрирован!",
         )
 
     # Назначаем пользователю роль "user"
-    query_role = (select(Role).where(Role.name == "user"))
+    query_role = select(Role).where(Role.name == "user")
     result_role = await session.execute(query_role)
     role_obj = result_role.scalar_one_or_none()
 
@@ -59,7 +59,7 @@ async def register_user(
         surname=user_in.surname,
         last_name=user_in.last_name,
         role_id=int(str(role_id)),  # чтобы IDE не ругалась
-        is_active=True
+        is_active=True,
     )
 
     session.add(new_user)
@@ -68,20 +68,21 @@ async def register_user(
 
     return new_user
 
+
 @router.post("/login", response_model=Token)
 async def login(
-        form_data: OAuth2PasswordRequestForm = Depends(),
-        session: AsyncSession = Depends(get_session)
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    session: AsyncSession = Depends(get_session),
 ):
     """
-        Аутентификация пользователя
+    Аутентификация пользователя
 
-        Args:
-            form_data (OAuth2PasswordRequestForm): Данные для аутентификации
-            session (AsyncSession): Сессия БД
+    Args:
+        form_data (OAuth2PasswordRequestForm): Данные для аутентификации
+        session (AsyncSession): Сессия БД
 
-        Returns:
-            Token: Токен доступа
+    Returns:
+        Token: Токен доступа
     """
 
     # Проверяем совпадение пароля и наличие пользователя в БД
@@ -90,11 +91,9 @@ async def login(
     user = result.scalar_one_or_none()
 
     # Если пользователь не найден или пароль не совпадает, выбрасываем 401 ошибку
-    if user is None or not verify_password(form_data.password,
-                                           user.hashed_password):
+    if user is None or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Неверный логин или пароль"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Неверный логин или пароль"
         )
 
     # Проверяем активность пользователя
@@ -113,14 +112,14 @@ async def login(
 @router.post("/logout")
 async def logout(current_user: User = Depends(get_current_user)):
     """
-        Выход пользователя из системы
-        Примечание: мы используем JWT, поэтому здесь ничего не делаем
+    Выход пользователя из системы
+    Примечание: мы используем JWT, поэтому здесь ничего не делаем
 
-        Args:
-            current_user (User): Текущий пользователь
+    Args:
+        current_user (User): Текущий пользователь
 
-        Returns:
-            Сообщение об успешном выходе
-        """
+    Returns:
+        Сообщение об успешном выходе
+    """
 
     return {"message": "Вы успешно вышли из системы"}

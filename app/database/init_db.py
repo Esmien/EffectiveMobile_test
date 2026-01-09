@@ -8,16 +8,16 @@ from app.core.security import get_password_hash
 
 async def _get_or_create(session: AsyncSession, model, **kwargs):
     """
-        Получить или создать объект модели.
+    Получить или создать объект модели.
 
-        Args:
-            session: AsyncSession - сессия базы данных
-            model: класс модели
-            **kwargs: параметры для поиска или создания объекта
+    Args:
+        session: AsyncSession - сессия базы данных
+        model: класс модели
+        **kwargs: параметры для поиска или создания объекта
 
-        Returns:
-            Объект модели
-        """
+    Returns:
+        Объект модели
+    """
 
     # Проверяем, существует ли объект с такими параметрами
     query = select(model).filter_by(**kwargs)
@@ -35,23 +35,21 @@ async def _get_or_create(session: AsyncSession, model, **kwargs):
 
 
 async def _create_access_rule_if_not_exists(
-        session: AsyncSession,
-        role_id: int, element_id: int, permissions: dict
+    session: AsyncSession, role_id: int, element_id: int, permissions: dict
 ):
     """
-        Создает правило доступа, если его еще нет
+    Создает правило доступа, если его еще нет
 
-        Args:
-            session: AsyncSession - сессия базы данных
-            role_id: int - ID роли
-            element_id: int - ID элемента бизнес-логики
-            permissions: dict - права доступа
-        """
+    Args:
+        session: AsyncSession - сессия базы данных
+        role_id: int - ID роли
+        element_id: int - ID элемента бизнес-логики
+        permissions: dict - права доступа
+    """
 
     # Проверяем, существует ли правило доступа с такими параметрами
     query = select(AccessRule).where(
-        AccessRule.role_id == role_id,
-        AccessRule.business_element_id == element_id
+        AccessRule.role_id == role_id, AccessRule.business_element_id == element_id
     )
     result = await session.execute(query)
     rule = result.scalar_one_or_none()
@@ -59,15 +57,13 @@ async def _create_access_rule_if_not_exists(
     # Если правило не существует, создаем его и добавляем в сессию
     if rule is None:
         rule = AccessRule(
-            role_id=role_id,
-            business_element_id=element_id,
-            **permissions
+            role_id=role_id, business_element_id=element_id, **permissions
         )
         session.add(rule)
 
 
 async def init_db(session: AsyncSession):
-    """ Заполняет базу данных ролями и правами доступа """
+    """Заполняет базу данных ролями и правами доступа"""
 
     # Заполняем роли
     admin_role = await _get_or_create(session, Role, name="admin")
@@ -85,7 +81,7 @@ async def init_db(session: AsyncSession):
             email="admin@admin.com",
             hashed_password=get_password_hash("admin"),
             role_id=admin_role.id,
-            name="Admin"
+            name="Admin",
         )
         session.add(admin_user)
         await session.flush()
@@ -107,7 +103,7 @@ async def init_db(session: AsyncSession):
             "read_permission": True,
             "update_permission": True,
             "delete_permission": True,
-        }
+        },
     )
 
     await _create_access_rule_if_not_exists(
@@ -122,7 +118,7 @@ async def init_db(session: AsyncSession):
             "read_permission": True,
             "update_permission": False,
             "delete_permission": False,
-        }
+        },
     )
 
     await _create_access_rule_if_not_exists(
@@ -137,7 +133,7 @@ async def init_db(session: AsyncSession):
             "read_permission": True,
             "update_permission": False,
             "delete_permission": False,
-        }
+        },
     )
 
     await session.commit()

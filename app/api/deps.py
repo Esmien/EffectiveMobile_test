@@ -12,20 +12,20 @@ from app.core.config import SECRET_KEY, ALGORITHM
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login")
 
+
 async def get_current_user(
-        token: str = Depends(oauth2_scheme),
-        session: AsyncSession = Depends(get_session)
+    token: str = Depends(oauth2_scheme), session: AsyncSession = Depends(get_session)
 ) -> User:
     """
-        Возвращает текущего пользователя
+    Возвращает текущего пользователя
 
-        Args:
-            token: токен пользователя
-            session: сессия базы данных
-        Returns:
-            User: пользователь
-        Raises:
-            HTTPException: если токен не валиден
+    Args:
+        token: токен пользователя
+        session: сессия базы данных
+    Returns:
+        User: пользователь
+    Raises:
+        HTTPException: если токен не валиден
     """
 
     # Создание исключения для невалидного токена
@@ -56,21 +56,19 @@ async def get_current_user(
         return user
 
 
-async def get_admin_user(
-        current_user: User = Depends(get_current_user)
-) -> User:
+async def get_admin_user(current_user: User = Depends(get_current_user)) -> User:
     """
-        Проверяет, является ли пользователь админом
+    Проверяет, является ли пользователь админом
 
-        Args:
-            current_user: текущий пользователь
+    Args:
+        current_user: текущий пользователь
 
-        Raises:
-            HTTPException: если пользователь не админ
+    Raises:
+        HTTPException: если пользователь не админ
 
-        Returns:
-            User: текущий пользователь с правами админа
-        """
+    Returns:
+        User: текущий пользователь с правами админа
+    """
 
     if current_user.role.name != "admin":
         raise HTTPException(
@@ -83,11 +81,11 @@ async def get_admin_user(
 
 class PermissionChecker:
     """
-        Проверяет наличие прав у пользователя
+    Проверяет наличие прав у пользователя
 
-        Attributes:
-            business_element: элемент бизнес-логики
-            permission: право доступа
+    Attributes:
+        business_element: элемент бизнес-логики
+        permission: право доступа
     """
 
     def __init__(self, business_element: str, permission: str):
@@ -95,22 +93,24 @@ class PermissionChecker:
         self.permission = permission
 
     async def __call__(
-            self,
-            user: User = Depends(get_current_user),
-            session: AsyncSession = Depends(get_session)
+        self,
+        user: User = Depends(get_current_user),
+        session: AsyncSession = Depends(get_session),
     ) -> User:
         """
-            Проверяет наличие прав у пользователя
+        Проверяет наличие прав у пользователя
 
-            Args:
-                user: текущий пользователь
-                session: сессия базы данных
-            Raises:
-                HTTPException: если у пользователя нет прав
+        Args:
+            user: текущий пользователь
+            session: сессия базы данных
+        Raises:
+            HTTPException: если у пользователя нет прав
         """
 
         # Поиск элемента бизнес-логики и прав доступа
-        query_element = select(BusinessElement).where(BusinessElement.name == self.business_element)
+        query_element = select(BusinessElement).where(
+            BusinessElement.name == self.business_element
+        )
         result_element = await session.execute(query_element)
         element = result_element.scalar_one_or_none()
 
@@ -122,7 +122,7 @@ class PermissionChecker:
 
         query_rule = select(AccessRule).where(
             element.id == AccessRule.business_element_id,
-            AccessRule.role_id == user.role_id
+            AccessRule.role_id == user.role_id,
         )
         result_rule = await session.execute(query_rule)
         rule = result_rule.scalar_one_or_none()
