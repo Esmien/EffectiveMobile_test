@@ -26,8 +26,7 @@ router = APIRouter()
 
 @router.post("/register", response_model=UserRead, status_code=201)
 async def register_user(
-    user_in: UserRegister,
-    session: AsyncSession = Depends(get_session)
+    user_in: UserRegister, session: AsyncSession = Depends(get_session)
 ):
     """
     Регистрирует пользователя, назначая ему по умолчанию роль "user"
@@ -84,21 +83,21 @@ async def register_user(
 
 @router.patch("/restore", response_model=UserRestore, status_code=201)
 async def restore_user(
-        form_data: OAuth2PasswordRequestForm = Depends(),
-        session: AsyncSession = Depends(get_session)
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    session: AsyncSession = Depends(get_session),
 ):
     """
-        Восстанавливает активность пользователя после 'мягкого' удаления
+    Восстанавливает активность пользователя после 'мягкого' удаления
 
-        Args:
-            form_data (OAuth2PasswordRequestForm): Данные для восстановления
-            session (AsyncSession): Сессия БД
+    Args:
+        form_data (OAuth2PasswordRequestForm): Данные для восстановления
+        session (AsyncSession): Сессия БД
 
-        Raises:
-            HTTPException: Если пользователь не найден (404), уже активен (409) или неверный пароль (401)
+    Raises:
+        HTTPException: Если пользователь не найден (404), уже активен (409) или неверный пароль (401)
 
-        Returns:
-            UserRestore: Восстановленный пользователь и сообщение об успешном восстановлении
+    Returns:
+        UserRestore: Восстановленный пользователь и сообщение об успешном восстановлении
     """
 
     user = await check_users_creds(form_data.username, form_data.password, session)
@@ -106,8 +105,7 @@ async def restore_user(
     if user.is_active:
         logger.warning(f"Пользователь {user.name} уже активен")
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Пользователь уже активен"
+            status_code=status.HTTP_409_CONFLICT, detail="Пользователь уже активен"
         )
 
     user.is_active = True
@@ -118,9 +116,9 @@ async def restore_user(
 
     logger.info(f"Пользователь {user.name} восстановлен")
     return UserRestore(
-        message=f"Пользователь {user.name} успешно восстановлен",
-        user=user
+        message=f"Пользователь {user.name} успешно восстановлен", user=user
     )
+
 
 @router.post("/login", response_model=Token)
 async def login(

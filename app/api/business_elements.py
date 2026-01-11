@@ -75,8 +75,8 @@ async def create_business_element(
 
 @router.get("/elements", response_model=list[BusinessElementRead])
 async def get_business_elements(
-        session: AsyncSession = Depends(get_session),
-        _: User = Depends(PermissionChecker("business_elements", "read_all_permission")),
+    session: AsyncSession = Depends(get_session),
+    _: User = Depends(PermissionChecker("business_elements", "read_all_permission")),
 ):
     """
     Получаем список бизнес-элементов

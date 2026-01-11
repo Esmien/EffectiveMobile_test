@@ -20,5 +20,5 @@ UVI_HOST = os.getenv("UVI_HOST", "0.0.0.0")
 LOGGER_CONFIG = {
     "colorize": True,
     "format": "<green>{time:HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{message}</cyan>",
-    "level": "DEBUG"
+    "level": "DEBUG",
 }

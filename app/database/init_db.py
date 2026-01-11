@@ -129,7 +129,9 @@ async def init_db(session: AsyncSession):
     }
     # Создаем элементы бизнес-логики
     users_element = await _get_or_create(session, BusinessElement, name="users")
-    business_element = await _get_or_create(session, BusinessElement, name="business_elements")
+    business_element = await _get_or_create(
+        session, BusinessElement, name="business_elements"
+    )
 
     # Заполняем права доступа (админ, пользователь, менеджер)
     for element in [users_element, business_element]:

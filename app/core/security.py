@@ -15,7 +15,6 @@ from app.core.config import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
     LOGGER_CONFIG,
 )
-from app.database.session import get_session
 from app.models.users import User
 
 
@@ -98,25 +97,21 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
     return jwt.encode(curr_data, SECRET_KEY, algorithm=ALGORITHM)
 
 
-async def check_users_creds(
-        email: str,
-        password: str,
-        session: AsyncSession
-) -> User:
+async def check_users_creds(email: str, password: str, session: AsyncSession) -> User:
     """
-        Проверка учетных данных пользователя.
-        Используется при аутентификации и восстановлении пользователя
+    Проверка учетных данных пользователя.
+    Используется при аутентификации и восстановлении пользователя
 
-        Args:
-            email (str): Электронная почта пользователя
-            password (str): Пароль пользователя
-            session (AsyncSession): Сессия SQLAlchemy для выполнения запросов к базе данных
+    Args:
+        email (str): Электронная почта пользователя
+        password (str): Пароль пользователя
+        session (AsyncSession): Сессия SQLAlchemy для выполнения запросов к базе данных
 
-        Raises:
-            HTTPException: Если учетные данные неверны, выбрасывается ошибка 401.
+    Raises:
+        HTTPException: Если учетные данные неверны, выбрасывается ошибка 401.
 
-        Returns:
-            User: Объект пользователя, если учетные данные верны.
+    Returns:
+        User: Объект пользователя, если учетные данные верны.
     """
     # Проверяем совпадение пароля и наличие пользователя в БД
     query = select(User).where(User.email == email)
