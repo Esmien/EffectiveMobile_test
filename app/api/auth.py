@@ -24,7 +24,12 @@ logger.add(
 router = APIRouter()
 
 
-@router.post("/register", response_model=UserRead, status_code=201)
+@router.post(
+    "/register",
+    response_model=UserRead,
+    status_code=status.HTTP_201_CREATED,
+    summary="Регистрация пользователя",
+)
 async def register_user(
     user_in: UserRegister, session: AsyncSession = Depends(get_session)
 ):
@@ -34,6 +39,9 @@ async def register_user(
     Args:
         user_in (UserRegister): Пользователь, которого нужно зарегистрировать
         session (AsyncSession): Сессия БД
+
+    Raises:
+        HTTPException: Если пользователь с таким email уже существует (400)
 
     Returns:
         UserRead: Зарегистрированный пользователь
@@ -81,7 +89,12 @@ async def register_user(
     return new_user
 
 
-@router.patch("/restore", response_model=UserChangeStatus, status_code=201)
+@router.patch(
+    "/restore",
+    response_model=UserChangeStatus,
+    status_code=status.HTTP_200_OK,
+    summary="Восстановление пользователя",
+)
 async def restore_user(
     form_data: OAuth2PasswordRequestForm = Depends(),
     session: AsyncSession = Depends(get_session),
@@ -120,7 +133,12 @@ async def restore_user(
     )
 
 
-@router.post("/login", response_model=Token)
+@router.post(
+    "/login",
+    response_model=Token,
+    status_code=status.HTTP_200_OK,
+    summary="Вход в систему",
+)
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     session: AsyncSession = Depends(get_session),
@@ -131,6 +149,9 @@ async def login(
     Args:
         form_data (OAuth2PasswordRequestForm): Данные для аутентификации
         session (AsyncSession): Сессия БД
+
+    Raises:
+        HTTPException: Если пользователь не найден или не активен (401)
 
     Returns:
         Token: Токен доступа
@@ -151,7 +172,7 @@ async def login(
     return Token(access_token=access_token, token_type="bearer")
 
 
-@router.post("/logout")
+@router.post("/logout", status_code=status.HTTP_200_OK, summary="Выход из системы")
 async def logout(current_user: User = Depends(get_current_user)):
     """
     Выход пользователя из системы

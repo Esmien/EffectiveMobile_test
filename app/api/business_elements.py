@@ -12,8 +12,10 @@ router = APIRouter()
 
 
 @router.post(
-    "/elements",
+    "/elements/create",
     response_model=BusinessElementRead,
+    status_code=201,
+    summary="Создание бизнес-элемента",
 )
 async def create_business_element(
     element_in: BusinessElementCreate,
@@ -27,6 +29,9 @@ async def create_business_element(
         element_in: данные для создания элемента
         session: сессия БД
         _: текущий пользователь, проверка прав доступа
+
+    Raises:
+        HTTPException: если элемент с таким именем уже существует (400)
 
     Returns:
         BusinessElementRead: созданный элемент
@@ -73,7 +78,12 @@ async def create_business_element(
     return new_element
 
 
-@router.get("/elements", response_model=list[BusinessElementRead])
+@router.get(
+    "/elements",
+    response_model=list[BusinessElementRead],
+    status_code=200,
+    summary="Получение списка бизнес-элементов",
+)
 async def get_business_elements(
     session: AsyncSession = Depends(get_session),
     _: User = Depends(PermissionChecker("business_elements", "read_all_permission")),

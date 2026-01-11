@@ -86,8 +86,10 @@ async def get_user_by_id(user_id: int, session: AsyncSession) -> User:
     Args:
         user_id: id пользователя
         session: сессия базы данных
+
     Raises:
         HTTPException: если пользователь не найден (404)
+
     Returns:
         User: пользователь
     """
@@ -129,6 +131,7 @@ class PermissionChecker:
         Args:
             user: текущий пользователь
             session: сессия базы данных
+
         Raises:
             HTTPException: если у пользователя нет прав
         """

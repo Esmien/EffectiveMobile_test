@@ -15,7 +15,11 @@ router = APIRouter()
 
 
 @router.post(
-    "/users/create", dependencies=[Depends(get_admin_user)], response_model=UserRead
+    "/users/create",
+    dependencies=[Depends(get_admin_user)],
+    response_model=UserRead,
+    status_code=status.HTTP_201_CREATED,
+    summary="Регистрация пользователя через админку",
 )
 async def create_user(
     user_in: UserCreate,
@@ -28,6 +32,9 @@ async def create_user(
     Args:
         user_in: данные пользователя
         session: сессия БД
+
+    Raises:
+        HTTPException: Пользователь с таким email уже существует (400)
 
     Returns:
         UserRead: Пользователь
@@ -86,6 +93,7 @@ async def create_user(
     dependencies=[Depends(get_admin_user)],
     status_code=status.HTTP_200_OK,
     response_model=UserRead,
+    summary="'Мягкое' удаление пользователя по ID",
 )
 async def soft_delete_user(
     user_id: int,
@@ -97,6 +105,9 @@ async def soft_delete_user(
     Args:
         user_id: id пользователя для удаления
         session: сессия БД
+
+    Raises:
+        HTTPException: Пользователь уже удален (409)
 
     Returns:
         UserRead: Удаленный пользователь
@@ -123,6 +134,7 @@ async def soft_delete_user(
     dependencies=[Depends(get_admin_user)],
     status_code=status.HTTP_200_OK,
     response_model=UserChangeStatus,
+    summary="Полное удаление пользователя",
 )
 async def total_delete_user(
     user_id: int,
@@ -135,7 +147,11 @@ async def total_delete_user(
         user_id: id пользователя для удаления
         session: сессия БД
 
+    Raises:
+        HTTPException: Пользователь не найден (404)
+
     Returns:
+        UserChangeStatus: данные удаленного пользователя
     """
 
     query = delete(User).where(User.id == user_id).returning(User)
@@ -161,6 +177,8 @@ async def total_delete_user(
     "/users/role/{user_id}",
     dependencies=[Depends(get_admin_user)],
     response_model=UserRead,
+    status_code=status.HTTP_200_OK,
+    summary="Изменение роли пользователя",
 )
 async def update_user_role(
     user_id: int,
@@ -176,7 +194,7 @@ async def update_user_role(
         session: сессия
 
     Raises:
-        404: Пользователь не найден, Роль не найдена
+        HTTPException: Пользователь не найден (404)
 
     Returns:
         UserRead: Обновленный пользователь
@@ -207,7 +225,10 @@ async def update_user_role(
 
 
 @router.patch(
-    "/permissions/{role_id}/{element_id}", dependencies=[Depends(get_admin_user)]
+    "/permissions/{role_id}/{element_id}",
+    dependencies=[Depends(get_admin_user)],
+    status_code=status.HTTP_200_OK,
+    summary="Изменение прав доступа для роли",
 )
 async def update_access_rule(
     role_id: int,
@@ -225,7 +246,10 @@ async def update_access_rule(
         session: сессия БД
 
     Raises:
-        404: Правило доступа не найдено
+        HTTPException: Правило доступа не найдено (404)
+
+    Returns:
+        json: {"message": "Права доступа обновлены"}
     """
 
     # Проверяем, существует ли правило доступа
