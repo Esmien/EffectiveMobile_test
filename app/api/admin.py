@@ -34,7 +34,10 @@ async def create_user(
         session: сессия БД
 
     Raises:
-        HTTPException: Пользователь с таким email уже существует (400)
+        HTTPException:
+            Пользователь с таким email уже существует (400)
+            Роль с таким id не найдена (404)
+            Базовая роль 'user' не найдена (500)
 
     Returns:
         UserRead: Пользователь
