@@ -1,0 +1,7 @@
+[tool.ruff]
+# Исключаем папку alembic из проверки
+extend-exclude = ["alembic"]
+
+[tool.ruff.lint]
+# E - ошибки стиля, F - логические ошибки
+select = ["E", "F"]

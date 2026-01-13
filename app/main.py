@@ -34,9 +34,7 @@ async def lifespan(app: FastAPI):
     # Настраиваем логи при старте
     setup_logging()
     logger.info("🚀 Logger сконфигурирован!")
-    logger.info(
-        f"Проверка подключения к БД: {settings.DATABASE_URL.split('@')[-1]}"
-    )
+    logger.info(f"Проверка подключения к БД: {settings.DATABASE_URL.split('@')[-1]}")
 
     run_migrations()
 

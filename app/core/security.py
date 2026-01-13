@@ -1,9 +1,7 @@
-import sys
-
 import bcrypt
 from datetime import datetime, timedelta, timezone
 
-from fastapi import Depends, HTTPException, status
+from fastapi import HTTPException, status
 from jose import jwt
 from loguru import logger
 from sqlalchemy import select

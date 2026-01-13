@@ -3,7 +3,6 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from loguru import logger
-import sys
 
 from app.api.deps import get_current_user
 from app.database.session import get_session
@@ -22,7 +21,8 @@ router = APIRouter()
     summary="Регистрация пользователя",
 )
 async def register_user(
-    user_in: UserRegister, session: AsyncSession = Depends(get_session)
+    user_in: UserRegister,
+    session: AsyncSession = Depends(get_session),
 ):
     """
     Регистрирует пользователя, назначая ему по умолчанию роль "user"
@@ -163,7 +163,11 @@ async def login(
     return Token(access_token=access_token, token_type="bearer")
 
 
-@router.post("/logout", status_code=status.HTTP_200_OK, summary="Выход из системы")
+@router.post(
+    "/logout",
+    status_code=status.HTTP_200_OK,
+    summary="Выход из системы",
+)
 async def logout(current_user: User = Depends(get_current_user)):
     """
     Выход пользователя из системы

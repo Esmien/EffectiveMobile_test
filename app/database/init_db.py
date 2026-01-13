@@ -35,7 +35,10 @@ async def _get_or_create(session: AsyncSession, model, **kwargs):
 
 
 async def _create_access_rule_if_not_exists(
-    session: AsyncSession, role_id: int, element_id: int, permissions: dict
+    session: AsyncSession,
+    role_id: int,
+    element_id: int,
+    permissions: dict,
 ):
     """
     Создает правило доступа, если его еще нет
@@ -49,7 +52,8 @@ async def _create_access_rule_if_not_exists(
 
     # Проверяем, существует ли правило доступа с такими параметрами
     query = select(AccessRule).where(
-        AccessRule.role_id == role_id, AccessRule.business_element_id == element_id
+        AccessRule.role_id == role_id,
+        AccessRule.business_element_id == element_id,
     )
     result = await session.execute(query)
     rule = result.scalar_one_or_none()
