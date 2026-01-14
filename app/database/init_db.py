@@ -1,9 +1,21 @@
+from typing import TypedDict
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.users import Role, User
 from app.models.rbac import BusinessElement, AccessRule
 from app.core.security import get_password_hash
+
+
+class RBACPermissions(TypedDict):
+    read_all_permission: bool
+    update_all_permission: bool
+    delete_all_permission: bool
+    create_permission: bool
+    read_permission: bool
+    update_permission: bool
+    delete_permission: bool
 
 
 async def _get_or_create(session: AsyncSession, model, **kwargs):
@@ -38,7 +50,7 @@ async def _create_access_rule_if_not_exists(
     session: AsyncSession,
     role_id: int,
     element_id: int,
-    permissions: dict,
+    permissions: RBACPermissions,
 ):
     """
     Создает правило доступа, если его еще нет
@@ -47,7 +59,7 @@ async def _create_access_rule_if_not_exists(
         session: AsyncSession - сессия базы данных
         role_id: int - ID роли
         element_id: int - ID элемента бизнес-логики
-        permissions: dict - права доступа
+        permissions: RBACPermissions - конструктор для создания прав доступа
     """
 
     # Проверяем, существует ли правило доступа с такими параметрами
@@ -65,7 +77,7 @@ async def _create_access_rule_if_not_exists(
 
 
 async def init_db(session: AsyncSession):
-    """Заполняет базу данных ролями и правами доступа"""
+    """ Заполняет базу данных ролями и правами доступа """
 
     # Заполняем роли
     admin_role = await _get_or_create(session, Role, name="admin")
@@ -101,33 +113,33 @@ async def init_db(session: AsyncSession):
 
     # Создаем словарь для быстрого доступа к правам доступа по имени роли
     permissions_map = {
-        "admin": {
-            "read_all_permission": True,
-            "update_all_permission": True,
-            "delete_all_permission": True,
-            "create_permission": True,
-            "read_permission": True,
-            "update_permission": True,
-            "delete_permission": True,
-        },
-        "manager": {
-            "read_all_permission": True,
-            "update_all_permission": False,
-            "delete_all_permission": False,
-            "create_permission": True,
-            "read_permission": True,
-            "update_permission": True,
-            "delete_permission": False,
-        },
-        "user": {
-            "read_all_permission": False,
-            "update_all_permission": False,
-            "delete_all_permission": False,
-            "create_permission": False,
-            "read_permission": True,
-            "update_permission": False,
-            "delete_permission": False,
-        },
+        "admin": RBACPermissions(
+            read_all_permission=True,
+            update_all_permission=True,
+            delete_all_permission=True,
+            create_permission=True,
+            read_permission=True,
+            update_permission=True,
+            delete_permission=True,
+    ),
+        "manager": RBACPermissions(
+            read_all_permission=True,
+            update_all_permission=False,
+            delete_all_permission=False,
+            create_permission=True,
+            read_permission=True,
+            update_permission=True,
+            delete_permission=False,
+    ),
+        "user": RBACPermissions(
+            read_all_permission=False,
+            update_all_permission=False,
+            delete_all_permission=False,
+            create_permission=False,
+            read_permission=True,
+            update_permission=False,
+            delete_permission=False,
+    ),
     }
     # Создаем элементы бизнес-логики
     users_element = await _get_or_create(session, BusinessElement, name="users")
