@@ -1,21 +1,10 @@
-from typing import TypedDict
-
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.users import Role, User
 from app.models.rbac import BusinessElement, AccessRule
 from app.core.security import get_password_hash
-
-
-class RBACPermissions(TypedDict):
-    read_all_permission: bool
-    update_all_permission: bool
-    delete_all_permission: bool
-    create_permission: bool
-    read_permission: bool
-    update_permission: bool
-    delete_permission: bool
+from app.schemas.rbac import RBACPermissions
 
 
 async def _get_or_create(session: AsyncSession, model, **kwargs):
@@ -72,7 +61,7 @@ async def _create_access_rule_if_not_exists(
 
     # Если правило не существует, создаем его и добавляем в сессию
     if rule is None:
-        rule = AccessRule(role_id=role_id, business_element_id=element_id, **permissions)
+        rule = AccessRule(role_id=role_id, business_element_id=element_id, **permissions.model_dump(exclude_none=True))
         session.add(rule)
 
 
@@ -124,21 +113,12 @@ async def init_db(session: AsyncSession):
     ),
         "manager": RBACPermissions(
             read_all_permission=True,
-            update_all_permission=False,
-            delete_all_permission=False,
             create_permission=True,
             read_permission=True,
             update_permission=True,
-            delete_permission=False,
     ),
         "user": RBACPermissions(
-            read_all_permission=False,
-            update_all_permission=False,
-            delete_all_permission=False,
-            create_permission=False,
             read_permission=True,
-            update_permission=False,
-            delete_permission=False,
     ),
     }
     # Создаем элементы бизнес-логики
