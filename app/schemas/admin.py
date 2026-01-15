@@ -1,14 +1,10 @@
 from pydantic import BaseModel
 
+from app.schemas.rbac import RBACPermissions
 
-class AccessRuleUpdate(BaseModel):
-    read_permission: bool | None = None
-    read_all_permission: bool | None = None
-    create_permission: bool | None = None
-    update_permission: bool | None = None
-    update_all_permission: bool | None = None
-    delete_permission: bool | None = None
-    delete_all_permission: bool | None = None
+
+class AccessRuleUpdate(RBACPermissions):
+    pass
 
 
 class UserRoleUpdate(BaseModel):
